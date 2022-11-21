@@ -1,0 +1,36 @@
+# 判断参数 ./deploy file
+
+# 设置基础变量
+TARGET_DIR=$1
+TARGET=${TARGET_DIR%*/}
+PORT=$(cat $TARGET/port)
+PATH_DEPLOY=/var/www/$TARGET
+
+# 编译系统
+rm $TARGET_DIR/build -rf
+cd $TARGET_DIR
+make html
+cd ..
+
+# 跟目录特殊处理
+if [ $TARGET = "note_index" ];then
+	rm /var/www/html -rf
+	cp $TARGET/build/html /var/www/ -rf
+	echo "120.48.82.24"
+	exit
+fi
+
+# 添加网页配置
+cd .config
+./nginx_config $TARGET $PORT
+cd ..
+
+# 部署网站文件
+rm $PATH_DEPLOY -rf
+cp $TARGET/build/html $PATH_DEPLOY/ -rf
+
+# 重启nginx
+systemctl reload nginx
+
+# 打印访问地址
+echo "120.48.82.24:$PORT"
