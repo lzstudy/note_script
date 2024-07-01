@@ -1,0 +1,2 @@
+cp note_linux_zw.conf /etc/nginx/conf.d/
+nginx -s reload
